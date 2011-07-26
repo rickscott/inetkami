@@ -1,0 +1,16 @@
+
+Commands
+
+metar
+taf
+wx (metar+taf) 
+
+weather warnings - ec, noaa
+
+
+
+METAR retrieval
+ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/CYAM.TXT
+
+TAF retrieval
+ftp://tgftp.nws.noaa.gov/data/forecasts/taf/stations/CYAM.TXT
