@@ -1,12 +1,33 @@
 
+Side-project:
+EC warnings
+
+RSS
+http://www.weatheroffice.gc.ca/rss/battleboard/ab20_e.xml
+=> dlvr.it
+
+terms: http://www.weatheroffice.gc.ca/mainmenu/disclaimer_e.html
+must declare EC as the source. 
+
+
+----
+
 Commands
 
 metar
 taf
 wx (metar+taf) 
 
-weather warnings - ec, noaa
+border wait times
+flight status (will require detailed work no doubt)
 
+weather warnings - ec, noaa
+** rss monitoring, at an interval...
+
+
+
+(at (time))
+(q (interval))
 
 
 METAR retrieval
@@ -14,3 +35,19 @@ ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/CYAM.TXT
 
 TAF retrieval
 ftp://tgftp.nws.noaa.gov/data/forecasts/taf/stations/CYAM.TXT
+
+EC warning: (SSMarie/Superior East)
+http://www.weatheroffice.gc.ca/warnings/report_e.html?on35
+
+US warning retrieval (chippewa county)
+http://alerts.weather.gov/cap/wwaatmget.php?x=MIZ008
+CAP (common alert protocol) / ATOM
+
+
+
+need a 140-char chunking function
+
+
+
+
+
