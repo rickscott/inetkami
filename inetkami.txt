@@ -47,6 +47,7 @@ CAP (common alert protocol) / ATOM
 
 need a 140-char chunking function
 
+eventually need to have logging, etc
 
 
 
