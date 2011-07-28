@@ -20,4 +20,9 @@ my $twitter = Net::Twitter->new(
     access_token_secret => $conf{'access_token_secret'},
 );
 
-$twitter->update("The Internet Kami have gained self-awareness. Hello, sentient beings everywhere! ^_^");
+# $twitter->update("The Internet Kami have gained self-awareness. Hello, sentient beings everywhere! ^_^");
+
+# main loop
+# check for DMs and hails repeatedly...nearly as often as possible, given API limits
+#my $twitter->mentions( since_id )
+#my $twitter->direct_messages( since_id )
