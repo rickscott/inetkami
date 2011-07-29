@@ -18,6 +18,8 @@ time-specifier ::= "at" "in" "q"
       ** timezones: one opt is to specify; the other -- 
          interpret based on twitter user's account setting?
          is that public???
+         GET users/show appears to return "utc offset" 
+         in seconds
    q: eg "q4h", "qid", "qd", "qd at 3pm"...? (3rd priority)
       -- for how long?
       -- need some way to delete stored "jobs"
@@ -27,21 +29,30 @@ time-specifier ::= "at" "in" "q"
 DM: whole text taken as command line
 Replies by @-reply or DM according to how sent.
 
-----
-modules
----
+modules (sorted by priority....)
+====================================================================
 
+pri 1
+--------------------------------------------------------------------
 metar
 taf
 wx (metar+taf) 
+  -- these are eeeasy
 
+
+pri 2
+--------------------------------------------------------------------
 border wait times
   * http://apps.cbp.gov/bwt/ (scrape pages; rss doesn't have the info)
-flight status (will require detailed work no doubt)
 
 weather warnings - ec, noaa
 ** rss monitoring, at an interval...
 
+pri 3
+--------------------------------------------------------------------
+flight status? (will require detailed work no doubt)
+ -- do research on what IRC bots usually offer
+   and what ppl might like for info from this twitter bot.
 
 
 (at (time))
