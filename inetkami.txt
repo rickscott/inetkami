@@ -1,24 +1,42 @@
+inetkami: the friendly spirits that inhabit teh internets
+  (and tell you thinks if you know how to talk with them nicely)
+---
 
-Side-project:
-EC warnings
+Command syntax
 
-RSS
-http://www.weatheroffice.gc.ca/rss/battleboard/ab20_e.xml
-=> dlvr.it
+(optional-time-specifier) command (arguments-if-any)
+                 ^--- module
 
-terms: http://www.weatheroffice.gc.ca/mainmenu/disclaimer_e.html
-must declare EC as the source. 
+eg
 
+@inetkami metar kanj
+@inetkami at 
+
+time-specifier ::= "at" "in" "q" 
+  in: eg "in 4h"      (first priority)
+  at: eg "at 9pm est", "at 2100" (2nd priority) 
+      ** timezones: one opt is to specify; the other -- 
+         interpret based on twitter user's account setting?
+         is that public???
+   q: eg "q4h", "qid", "qd", "qd at 3pm"...? (3rd priority)
+      -- for how long?
+      -- need some way to delete stored "jobs"
+
+
+@reply: @inetkami at start of line only
+DM: whole text taken as command line
+Replies by @-reply or DM according to how sent.
 
 ----
-
-Commands
+modules
+---
 
 metar
 taf
 wx (metar+taf) 
 
 border wait times
+  * http://apps.cbp.gov/bwt/ (scrape pages; rss doesn't have the info)
 flight status (will require detailed work no doubt)
 
 weather warnings - ec, noaa
@@ -43,11 +61,21 @@ US warning retrieval (chippewa county)
 http://alerts.weather.gov/cap/wwaatmget.php?x=MIZ008
 CAP (common alert protocol) / ATOM
 
+EC warnings
+
+RSS
+http://www.weatheroffice.gc.ca/rss/battleboard/ab20_e.xml
+=> dlvr.it
+
+terms: http://www.weatheroffice.gc.ca/mainmenu/disclaimer_e.html
+must declare EC as the source. 
+
 
 
 need a 140-char chunking function
 
 eventually need to have logging, etc
+
 
 
 
