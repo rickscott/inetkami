@@ -7,11 +7,11 @@ use strict;
 use Net::Twitter;
 use Config::General;
 use DBM::Deep;
+use WWW::Mechanize;
 use POSIX qw/ceil/;
 
 use Data::Dumper; # XXX DEBUG
 
-use Config::General;
 my $config = new Config::General("inetkami.cfg");
 my %conf = $config->getall;
 
@@ -31,10 +31,16 @@ $db->{last_dm}      = 0 unless exists $db->{last_dm};
 
 
 # determine how long to wait between fetches.
-my $api_per_hour = $twitter->rate_limit_status->{hourly_limit};
-my $fetch_delay = ceil(3600 / $api_per_hour);
+my $rate_limit     = $twitter->rate_limit_status;
+my $api_per_hour   = $rate_limit->{hourly_limit};
+my $api_hits_left  = $rate_limit->{remaining_hits};
+# my $fetch_delay = ceil(3600 / $api_per_hour); 
 
-say "API calls per hour: $api_per_hour . One fetch every $fetch_delay sec.";
+# XXX just in case I have got things wrong
+my $fetch_delay = ceil(3600 / ($api_per_hour * 0.7)); 
+
+say "API calls per hour: $api_per_hour. One fetch every $fetch_delay sec.";
+say "Current API hits remaining: $api_hits_left.";
 
 
 # main loop 
@@ -56,7 +62,8 @@ for(;;) {
 
         say "Processing mention $mention->{id}.";
 
-        if ($mention->{text} =~ /^\@inetkami metar (\w\w\w\w)/) {
+        ### METAR 
+        if ($mention->{text} =~ /^\@inetkami metar (\w\w\w\w)/i) {
             my $station = $1; 
             say "** METAR request for station $1.";
             my $metar = `/usr/bin/metar $station`;
@@ -67,7 +74,22 @@ for(;;) {
                 in_reply_to_status_id => $mention->{id},
                 status => $reply,
             });
+        }
+        ### BWT 
+        elsif ($mention->{text} =~ /^\@inetkami bwt/i) {
+            say "** Border wait time request.";
+            my $mech = WWW::Mechanize->new();
+            $mech->get('http://apps.cbp.gov/bwt/display_rss_port.asp?port=380301');
 
+            say $mech->content();
+
+            if ($mech->content() =~ m{<td headers="pv stdpv" [^>]*>([^/]+)</td>}) {
+                my $bwt = $1;
+                $bwt =~ s/<br>/, /g;
+                my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $bwt);
+
+                say "** Sending reply: $reply";
+            }
 
         }
 
