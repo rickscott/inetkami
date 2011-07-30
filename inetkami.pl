@@ -81,14 +81,16 @@ for(;;) {
             my $mech = WWW::Mechanize->new();
             $mech->get('http://apps.cbp.gov/bwt/display_rss_port.asp?port=380301');
 
-            say $mech->content();
-
             if ($mech->content() =~ m{<td headers="pv stdpv" [^>]*>([^/]+)</td>}) {
                 my $bwt = $1;
                 $bwt =~ s/<br>/, /g;
                 my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $bwt);
 
                 say "** Sending reply: $reply";
+                $twitter->update({
+                    in_reply_to_status_id => $mention->{id},
+                    status => $reply,
+                });
             }
 
         }
@@ -97,6 +99,7 @@ for(;;) {
         $db->{last_mention} = $mention->{id};
     }
 
+    say '-' x 68;
     sleep $fetch_delay;
 
 
