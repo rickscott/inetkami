@@ -22,15 +22,22 @@ my $twitter = Net::Twitter->new(
 
 # $twitter->update("The Internet Kami have gained self-awareness. Hello, sentient beings everywhere! ^_^");
 
-# main loop
-# check for DMs and hails repeatedly...nearly as often as possible, given API limits
-#my $twitter->mentions( since_id )
+# startup. get the API limit
+
+say "API calls left for this hour: " . Dumper($twitter->rate_limit_status);
+
+# pull the database if there is one, create it if not 
+
+# main loop 
+# for(;;) {
+    # check for mentions & process
+    my $mentions = $twitter->mentions();
+    say Dumper($mentions);
+
+    # check for DMs and process
 #my $twitter->direct_messages( since_id )
-
-
-
-# net::twitter
-
+  
+# }
 
 # start by getting API req per hour
 # and use that to yield how frequently to check for DMs and replies
@@ -45,9 +52,10 @@ my $twitter = Net::Twitter->new(
 
 
 # main loop (singlethread this for now for simplicity...?)
-# check for @replies 
+# check for @replies - allowed 200 at a time 
+## https://dev.twitter.com/docs/api/1/get/statuses/mentions
 ##  process each @reply
-# check for @DMs 
+# check for @DMs - again, max 200 at a time 
 ##  process each @DM
 # what time is it?
 # sleep until next interval...
