@@ -6,6 +6,9 @@ use strict;
 
 use Net::Twitter;
 use Config::General;
+use DBM::Deep;
+use POSIX qw/ceil/;
+
 use Data::Dumper; # XXX DEBUG
 
 use Config::General;
@@ -20,41 +23,81 @@ my $twitter = Net::Twitter->new(
     access_token_secret => $conf{'access_token_secret'},
 );
 
-# $twitter->update("The Internet Kami have gained self-awareness. Hello, sentient beings everywhere! ^_^");
 
-# startup. get the API limit
+# open the database if there is one, create it if not 
+my $db = DBM::Deep->new("inetkami.db");
+$db->{last_mention} = 0 unless exists $db->{last_mention};
+$db->{last_dm}      = 0 unless exists $db->{last_dm};
 
-say "API calls left for this hour: " . Dumper($twitter->rate_limit_status);
 
-# pull the database if there is one, create it if not 
+# determine how long to wait between fetches.
+my $api_per_hour = $twitter->rate_limit_status->{hourly_limit};
+my $fetch_delay = ceil(3600 / $api_per_hour);
+
+say "API calls per hour: $api_per_hour . One fetch every $fetch_delay sec.";
+
 
 # main loop 
-# for(;;) {
-    # check for mentions & process
-    my $mentions = $twitter->mentions();
-    say Dumper($mentions);
+for(;;) {
+    my $mentions = $twitter->mentions({
+#       count => 200, since_id => $db->{last_mention}
+        count => 200, 
+    });
 
-    # check for DMs and process
-#my $twitter->direct_messages( since_id )
+    # say "All mentions from fetch: ";
+    # say Dumper $mentions;
+    # say "-----------------------";
+
+    MENTION:
+    foreach my $mention (@$mentions) {
+        say "Examining mention $mention->{id}.";
+
+        next MENTION if ($mention->{id} <= $db->{last_mention});
+
+        say "Processing mention $mention->{id}.";
+
+        if ($mention->{text} =~ /^\@inetkami metar (\w\w\w\w)/) {
+            my $station = $1; 
+            say "** METAR request for station $1.";
+            my $metar = `/usr/bin/metar $station`;
+            my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $metar);
+
+            say "** Sending reply: $reply";
+            $twitter->update({
+                in_reply_to_status_id => $mention->{id},
+                status => $reply,
+            });
+
+
+        }
+
+        # done; update db to show we processed this mention
+        $db->{last_mention} = $mention->{id};
+    }
+
+    sleep $fetch_delay;
+
+
+ 
+
+    # check for DMs and process: TODO
+    #my $twitter->direct_messages( since_id )
   
-# }
+}
 
-# start by getting API req per hour
-# and use that to yield how frequently to check for DMs and replies
-## 350req/hr = one req every 10s or so
 ## how to distribute this, @replies vs DMs?
-## if we get to the point of more than 20 replies/DMs for each poll,
+## if we get to the point of more than 200 replies/DMs for each poll,
 ## we will have to paginate, which will cut into our API call limit
-## even more...
-
-## streaming API may be the answer to this? Check.
-## and does Net::Twitter support it?
+## even more...I think that is far off though.
+## at that point, time to look at the Streaming API ^_^;
 
 
 # main loop (singlethread this for now for simplicity...?)
 # check for @replies - allowed 200 at a time 
 ## https://dev.twitter.com/docs/api/1/get/statuses/mentions
 ##  process each @reply
+## $twitter->update("@person foo");
+
 # check for @DMs - again, max 200 at a time 
 ##  process each @DM
 # what time is it?
