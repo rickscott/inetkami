@@ -45,9 +45,11 @@ say "Current API hits remaining: $api_hits_left.";
 
 # main loop 
 for(;;) {
+
+    say "** last mention processed was: " . $db->{last_mention};
+
     my $mentions = $twitter->mentions({
-#       count => 200, since_id => $db->{last_mention}
-        count => 200, 
+        count => 200, since_id => $db->{last_mention}
     });
 
     # say "All mentions from fetch: ";
