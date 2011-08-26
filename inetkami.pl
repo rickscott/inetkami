@@ -44,15 +44,23 @@ say "Current API hits remaining: $api_hits_left.";
 
 
 # main loop 
-for(;;) {
+FETCH:
+while(1) {
+    my $mentions;
 
-    say "** last mention processed was: " . $db->{last_mention};
+    eval {
+        $mentions = $twitter->mentions({
+            count => 200, since_id => $db->{last_mention}
+        });
+    };
+    if ($@) {
+        handle_error($@);
+        next FETCH;
+    }
 
-    my $mentions = $twitter->mentions({
-        count => 200, since_id => $db->{last_mention}
-    });
-
-    say "** " . scalar @$mentions . " new mentions to examine.";
+    say sprintf("** last mention proc'd: %s; %s new.", 
+        $db->{last_mention}, scalar @$mentions
+    );
 
     MENTION:
     foreach my $mention (@$mentions) {
@@ -102,15 +110,42 @@ for(;;) {
         $db->{last_mention} = $mention->{id};
     }
 
-    say '-' x 68;
-    sleep $fetch_delay;
-
-
- 
 
     # check for DMs and process: TODO
     #my $twitter->direct_messages( since_id )
-  
+
+}
+continue {
+    say '-' x 68;
+    sleep $fetch_delay;
+} 
+
+# ref: https://dev.twitter.com/docs/error-codes-responses
+sub handle_error {
+    my $error = shift;
+
+    warn "%% ERROR: $error";
+
+    given ($error->code) {
+        when ([304, 406]) {        # we should never see these; ignore
+            say "Ignoring...";
+        }
+        when (401) {               # login fail; bail out entirely
+            die "Login failure -- please correct my credentials";
+        }
+        when ([400, 420]) {        # we hit the request ratelimit >_<
+            sleep 3600;   # TODO more intelligent strategy =)
+        }
+        when (403) {               # we hit the update ratelimit >_<
+            sleep 3600;   # TODO more intelligent strategy =)
+        }
+        when ([500, 502, 503]) {   # twitter is having issues
+            sleep 3 * $fetch_delay;   # cut them a break =)
+        }
+        default {                  # something else bad happened
+            die "Some error happened that I can't deal with =(";
+        }
+    } 
 }
 
 ## how to distribute this, @replies vs DMs?
