@@ -52,15 +52,16 @@ for(;;) {
         count => 200, since_id => $db->{last_mention}
     });
 
-    # say "All mentions from fetch: ";
-    # say Dumper $mentions;
-    # say "-----------------------";
+    say "** " . scalar @$mentions . " new mentions to examine.";
 
     MENTION:
     foreach my $mention (@$mentions) {
         say "Examining mention $mention->{id}.";
 
-        next MENTION if ($mention->{id} <= $db->{last_mention});
+        if ($mention->{id} <= $db->{last_mention}) {
+            warn "%%% Twitter gave us a mention out of order! %%%";
+            next MENTION;
+        }
 
         say "Processing mention $mention->{id}.";
 
