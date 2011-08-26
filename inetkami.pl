@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use 5.010;
+
 use warnings;
 use strict;
 
@@ -34,10 +35,7 @@ $db->{last_dm}      = 0 unless exists $db->{last_dm};
 my $rate_limit     = $twitter->rate_limit_status;
 my $api_per_hour   = $rate_limit->{hourly_limit};
 my $api_hits_left  = $rate_limit->{remaining_hits};
-# my $fetch_delay = ceil(3600 / $api_per_hour); 
-
-# XXX just in case I have got things wrong
-my $fetch_delay = ceil(3600 / ($api_per_hour * 0.7)); 
+my $fetch_delay = ceil(3600 / $api_per_hour); 
 
 say "API calls per hour: $api_per_hour. One fetch every $fetch_delay sec.";
 say "Current API hits remaining: $api_hits_left.";
@@ -80,11 +78,9 @@ while(1) {
             my $metar = `/usr/bin/metar $station`;
             my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $metar);
 
-            say "** Sending reply: $reply";
-            $twitter->update({
-                in_reply_to_status_id => $mention->{id},
-                status => $reply,
-            });
+            send_reply(
+                $twitter, $mention->{id}, $mention->{user}->{screen_name}, $metar
+            ); 
         }
         ### BWT 
         elsif ($mention->{text} =~ /^\@inetkami bwt/i) {
@@ -119,6 +115,27 @@ continue {
     say '-' x 68;
     sleep $fetch_delay;
 } 
+
+sub send_reply {
+    my $twitter = shift;
+    my $in_reply_to = shift;
+    my $reply_to_user = shift;
+    my $msg = shift;
+
+
+    my $reply_string = sprintf('@%s %s', $reply_to_user, $msg);
+    if (length($reply_string) > 140) {  # FIXME: Unicode / char semantics
+        $reply_string = substr($reply_string, 0, 139) . '>';
+    }
+
+    say '** Sending reply: ' . $reply_string;
+
+    $twitter->update({
+        in_reply_to_status_id => $in_reply_to,
+        status                => $reply_string
+    });
+}
+
 
 # ref: https://dev.twitter.com/docs/error-codes-responses
 sub handle_error {
