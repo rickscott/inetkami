@@ -2,3 +2,6 @@ consumer_key         <your-consumer-key>
 consumer_secret      <your-consumer-secret>
 access_token         <your-access-token>
 access_token_secret  <your-access-token-secret>
+
+metar_url  ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/
+taf_url    ftp://tgftp.nws.noaa.gov/data/forecasts/taf/stations/

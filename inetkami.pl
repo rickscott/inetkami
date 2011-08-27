@@ -24,6 +24,8 @@ my $twitter = Net::Twitter->new(
     access_token_secret => $conf{'access_token_secret'},
 );
 
+my $metar_url = $conf{'metar_url'};
+my $taf_url   = $conf{'taf_url'};
 
 # open the database if there is one, create it if not 
 my $db = DBM::Deep->new("inetkami.db");
