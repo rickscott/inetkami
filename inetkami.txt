@@ -1,5 +1,5 @@
 inetkami: the friendly spirits that inhabit teh internets
-  (and tell you thinks if you know how to talk with them nicely)
+  (and tell you things if you know how to talk with them nicely)
 ---
 
 Command syntax
@@ -20,6 +20,7 @@ time-specifier ::= "at" "in" "q"
          is that public???
          GET users/show appears to return "utc offset" 
          in seconds
+         note: http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-c-find_tzinfo
    q: eg "q4h", "qid", "qd", "qd at 3pm"...? (3rd priority)
       -- for how long?
       -- need some way to delete stored "jobs"
@@ -29,15 +30,29 @@ time-specifier ::= "at" "in" "q"
 DM: whole text taken as command line
 Replies by @-reply or DM according to how sent.
 
+
+
+Development priorities
+====================================================================
+
+* respond (more) intelligently to ratelimit, etc errors 
+* split messages across the 140-char boundary
+* tests!
+* refactor & cleanup
+* need to check that everything needed is in the config file
+
+* eventually: ratelimiting to prevent abuse?
+
 modules (sorted by priority....)
 ====================================================================
 
 pri 1
 --------------------------------------------------------------------
-metar
+metar 
 taf
 wx (metar+taf) 
   -- these are eeeasy
+  -- these need to be recycled into a fetch to noaa's ftp site
 
 
 pri 2
@@ -54,6 +69,8 @@ flight status? (will require detailed work no doubt)
  -- do research on what IRC bots usually offer
    and what ppl might like for info from this twitter bot.
 
+traffic?
+airport security checkpoint wait times?
 
 (at (time))
 (q (interval))
