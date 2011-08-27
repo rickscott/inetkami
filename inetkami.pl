@@ -73,11 +73,16 @@ while(1) {
 
         say "Processing mention $mention->{id}.";
 
-        ### METAR 
-        if ($mention->{text} =~ /^\@inetkami metar (\w\w\w\w)/i) {
-            my $station = $1; 
-            say "** METAR request for station $1.";
-            my $metar = `/usr/bin/metar $station`;
+        ### METAR / TAF / WX
+        if ($mention->{text} =~ /^\@inetkami (metar|taf|wx) ([a-z]{4})/i) {
+            my $command = $1; 
+            my $station = $2; 
+            say "** METAR request for station $2.";
+
+            my $mech = WWW::Mechanize->new();
+            $mech->get( $metar_url . uc($station) . '.TXT');
+            my $metar = $mech->content();
+
             my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $metar);
 
             send_reply(
