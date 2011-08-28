@@ -90,13 +90,7 @@ while(1) {
             if ($mech->content() =~ m{<td headers="pv stdpv" [^>]*>([^/]+)</td>}) {
                 my $bwt = $1;
                 $bwt =~ s/<br>/, /g;
-                my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $bwt);
-
-                say "** Sending reply: $reply";
-                $twitter->update({
-                    in_reply_to_status_id => $mention->{id},
-                    status => $reply,
-                });
+                send_reply($twitter, $mention, $bwt);
             }
 
         }
@@ -129,10 +123,7 @@ sub handle_wx {
         $mech->get( $metar_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
 
-        my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $wx);
-        send_reply(
-            $twitter, $mention->{id}, $mention->{user}->{screen_name}, $reply
-        ); 
+        send_reply($twitter, $mention, $wx);
     }  
 
     # return TAF for given station 
@@ -140,21 +131,21 @@ sub handle_wx {
         $mech->get( $taf_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
 
-        my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $wx);
-        send_reply(
-            $twitter, $mention->{id}, $mention->{user}->{screen_name}, $reply
-        ); 
+        send_reply($twitter, $mention, $wx);
     }  
 }
 
 sub send_reply {
-    my $twitter = shift;
-    my $in_reply_to = shift;
-    my $reply_to_user = shift;
-    my $msg = shift;
+    my $twitter      = shift;
+    my $reply_to_msg = shift;
+    my $reply_text   = shift;
 
+    # reply must begin with a mention to the user that mentioned us
+    my $reply_string = sprintf('@%s %s', 
+        $reply_to_msg->{user}->{screen_name},
+        $reply_text
+    );
 
-    my $reply_string = sprintf('@%s %s', $reply_to_user, $msg);
     if (length($reply_string) > 140) {  # FIXME: Unicode / char semantics
         $reply_string = substr($reply_string, 0, 139) . '>';
     }
@@ -162,8 +153,8 @@ sub send_reply {
     say '** Sending reply: ' . $reply_string;
 
     $twitter->update({
-        in_reply_to_status_id => $in_reply_to,
-        status                => $reply_string
+        in_reply_to_status_id => $reply_to_msg->{id},
+        status                => $reply_string,
     });
 }
 
