@@ -124,6 +124,7 @@ sub handle_wx {
 
     my $mech = WWW::Mechanize->new();
 
+    # return METAR for given station 
     unless($command eq 'TAF') {
         $mech->get( $metar_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
@@ -134,6 +135,7 @@ sub handle_wx {
         ); 
     }  
 
+    # return TAF for given station 
     unless($command eq 'METAR') {
         $mech->get( $taf_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
