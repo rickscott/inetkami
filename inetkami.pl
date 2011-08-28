@@ -75,19 +75,11 @@ while(1) {
 
         ### METAR / TAF / WX
         if ($mention->{text} =~ /^\@inetkami (metar|taf|wx) ([a-z]{4})/i) {
-            my $command = $1; 
-            my $station = $2; 
-            say "** METAR request for station $2.";
+            my $command = uc($1); 
+            my $station = uc($2); 
+            say "** $command request for station $station.";
 
-            my $mech = WWW::Mechanize->new();
-            $mech->get( $metar_url . uc($station) . '.TXT');
-            my $metar = $mech->content();
-
-            my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $metar);
-
-            send_reply(
-                $twitter, $mention->{id}, $mention->{user}->{screen_name}, $metar
-            ); 
+            handle_wx($twitter, $mention, $command, $station)
         }
         ### BWT 
         elsif ($mention->{text} =~ /^\@inetkami bwt/i) {
@@ -121,7 +113,37 @@ while(1) {
 continue {
     say '-' x 68;
     sleep $fetch_delay;
-} 
+} #end of main loop
+
+# handle_wx: handle a req for metar, taf, or wx (both metar & taf)
+sub handle_wx {
+    my $twitter = shift;
+    my $mention = shift;
+    my $command = shift;   # one of 'METAR', 'TAF', 'WX'
+    my $station = shift;   # 4 letters, uppercase
+
+    my $mech = WWW::Mechanize->new();
+
+    unless($command eq 'TAF') {
+        $mech->get( $metar_url . $station . '.TXT');
+        my $wx = $mech->content();  # FIXME: handle failure
+
+        my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $wx);
+        send_reply(
+            $twitter, $mention->{id}, $mention->{user}->{screen_name}, $reply
+        ); 
+    }  
+
+    unless($command eq 'METAR') {
+        $mech->get( $taf_url . $station . '.TXT');
+        my $wx = $mech->content();  # FIXME: handle failure
+
+        my $reply = sprintf('@%s %s', $mention->{user}->{screen_name}, $wx);
+        send_reply(
+            $twitter, $mention->{id}, $mention->{user}->{screen_name}, $reply
+        ); 
+    }  
+}
 
 sub send_reply {
     my $twitter = shift;
