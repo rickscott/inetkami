@@ -37,6 +37,12 @@ Development priorities
 
 * respond (more) intelligently to ratelimit, etc errors 
 * split messages across the 140-char boundary
+* respond intelligently to errors in fetch
+** especially important because some stations have metar but no
+   taf, & vice versa!
+* also, some numeric stations have tafs, so we should adjust our
+  station identifier filtering...
+
 * tests!
 * refactor & cleanup
 * need to check that everything needed is in the config file
