@@ -122,6 +122,8 @@ sub handle_wx {
     unless($command eq 'TAF') {
         $mech->get( $metar_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
+        $wx =~ s/^[^\n]*\n//;       # squash the first line (datestamp)
+        $wx = 'METAR ' . $wx; 
 
         send_reply($twitter, $mention, $wx);
     }  
@@ -130,6 +132,8 @@ sub handle_wx {
     unless($command eq 'METAR') {
         $mech->get( $taf_url . $station . '.TXT');
         my $wx = $mech->content();  # FIXME: handle failure
+        $wx =~ s/^[^\n]*\n//;       # squash the first line (datestamp)
+        $wx =~ s/ +/ /g;            # multiple spaces => one space
 
         send_reply($twitter, $mention, $wx);
     }  
