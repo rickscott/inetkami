@@ -41,6 +41,11 @@ Development priorities
 * refactor & cleanup
 * need to check that everything needed is in the config file
 
+* handle "status is a duplicate" err. 
+* handle failures to fetch metar/bwt/etc.
+
+* a way to manually mark a mention as processed would be cool
+
 * eventually: ratelimiting to prevent abuse?
 
 modules (sorted by priority....)
@@ -48,12 +53,6 @@ modules (sorted by priority....)
 
 pri 1
 --------------------------------------------------------------------
-metar 
-taf
-wx (metar+taf) 
-  -- these are eeeasy
-  -- these need to be recycled into a fetch to noaa's ftp site
-
 
 pri 2
 --------------------------------------------------------------------
