@@ -1,0 +1,32 @@
+inetkami - infobot for twitter
+====================================================================
+
+Introduction
+--------------------------------------------------------------------
+Infobots have a long history and tradition on IRC.  This is sort of 
+the equivalent for twitter, optimized for information one might
+like to get while travelling in a form that's usable via an
+SMS-enabled non-smartphone.
+
+
+Rationale
+--------------------------------------------------------------------
+Why does this exist in the smartphone era?  Well, here in small-town
+Canada we're saddled with a de-facto monopoly of incumbent wireless 
+providers.  Data rates are absurdly expensive, and public wifi is 
+extremely spotty.  It's common, however, to have a mobile plan with
+unlimited SMS.  With twitter as a bridge, then, one can devise
+a service that efficiently lets you tap into some of the bits you 
+might want to know while you're out and about, without having to
+remortgage your house to pay for a data plan.  
+
+Being able to efficiently query things via your twitter account on 
+your laptop, desktop, or smartphone is a nice side effect, as is
+being able to share the results easily.
+
+
+Why the name?
+--------------------------------------------------------------------
+In Shinto, 
+explanation about kami
+the spirits that live in the internetz 
