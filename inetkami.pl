@@ -144,6 +144,14 @@ sub send_reply {
     my $reply_to_msg = shift;
     my $reply_text   = shift;
 
+    # …
+    # chunking semantics:
+    # the size remaining to be sent is: 
+    #   len(screenname) + 1 + len(remaining text)
+    # if the size remaining to send is > 140char
+    #   send as much as possible of 139char + ellipsis
+    #   break on a word boundary (\s) to a max of 20 chars 
+
     # reply must begin with a mention to the user that mentioned us
     my $reply_string = sprintf('@%s %s', 
         $reply_to_msg->{user}->{screen_name},
