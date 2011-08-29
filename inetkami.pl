@@ -4,6 +4,7 @@ use 5.010;
 
 use warnings;
 use strict;
+use utf8;
 
 use Net::Twitter;
 use Config::General;
